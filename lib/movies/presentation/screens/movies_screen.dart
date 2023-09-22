@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:movies_app/core/services/services_locator.dart';
-import 'package:movies_app/movies/presentation/controller/movies_bloc.dart';
-import 'package:movies_app/movies/presentation/controller/movies_event.dart';
+import '../../../core/services/services_locator.dart';
+import '../controller/movies_bloc.dart';
+import '../controller/movies_event.dart';
 import '../components/now_playing_component.dart';
 import '../components/popular_component.dart';
 import '../components/top_rated_component.dart';
@@ -14,12 +14,12 @@ class MoviesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => serviceLocator<MoviesBloc>()
+      create: (context) => sl<MoviesBloc>()
         ..add(GetNowPlayingMoviesEvent())
         ..add(GetPopularMoviesEvent())
         ..add(GetTopRatedMoviesEvent()),
       child: Scaffold(
-        backgroundColor: Colors.grey.shade900,
+        
         body: SingleChildScrollView(
           key: const Key('movieScrollView'),
           child: Column(
@@ -43,10 +43,10 @@ class MoviesScreen extends StatelessWidget {
                       onTap: () {
                         /// TODO : NAVIGATION TO POPULAR SCREEN
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Row(
-                          children: const [
+                          children: [
                             Text(
                               'See More',
                               style: TextStyle(color: Colors.white),
@@ -83,10 +83,10 @@ class MoviesScreen extends StatelessWidget {
                       onTap: () {
                         /// TODO : NAVIGATION TO Top Rated Movies Screen
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Row(
-                          children: const [
+                          children: [
                             Text(
                               'See More',
                               style: TextStyle(color: Colors.white),

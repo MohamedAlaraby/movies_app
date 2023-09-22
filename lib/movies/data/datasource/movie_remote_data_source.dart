@@ -1,13 +1,23 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
-import 'package:movies_app/core/network/api_constants.dart';
-import 'package:movies_app/core/network/error_message_model.dart';
-import 'package:movies_app/movies/data/models/movie_model.dart';
+import '../../../core/network/api_constants.dart';
+import '../../../core/network/error_message_model.dart';
+import '../models/movie_details_model.dart';
+import '../models/movie_model.dart';
+import '../models/recommendation_model.dart';
+import '../../domain/entites/movie_details.dart';
+import '../../domain/usecases/get_movie_details_usecase.dart';
+import '../../domain/usecases/get_recommendations_usecase.dart';
 import '../../../core/error/exception.dart';
 
 abstract class BaseMovieRemoteDataSource {
   Future<List<MovieModel>> getNowPlayingMovie();
   Future<List<MovieModel>> getPopulerMovies();
   Future<List<MovieModel>> getTopRatedMovies();
+  Future<MovieDetails> getMovieDetails(MovieDetailsParameters parameters);
+  Future<List<RecommendationModel>> getRecommendations(
+      RecommendaionParameters parameters);
 }
 
 class MovieRemoteDataSource extends BaseMovieRemoteDataSource {
@@ -61,6 +71,43 @@ class MovieRemoteDataSource extends BaseMovieRemoteDataSource {
     } else {
       throw ServerException(
           errorMessageModel: ErrorMessageModel.fromJson(response.data));
+    }
+  }
+
+  @override
+  Future<MovieDetails> getMovieDetails(
+      MovieDetailsParameters parameters) async {
+    Response response =
+        await dio.get(ApiConstants.movieDetailsEndPoint(parameters.movieId));
+    if (response.statusCode == 200) {
+      return MovieDetialsModel.fromJson(response.data);
+    } else {
+      throw ServerException(
+        errorMessageModel: ErrorMessageModel.fromJson(
+          response.data,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<List<RecommendationModel>> getRecommendations(
+      RecommendaionParameters parameters) async {
+    final result = await dio.get(
+      ApiConstants.recommendationsEndPoint(parameters.id),
+    );
+
+    if (result.statusCode == 200) {
+      print("The recommendations status code is ${result.statusCode}");
+      return List<RecommendationModel>.from(
+        (result.data["results"] as List).map(
+          (recommendation) => RecommendationModel.fromJson(recommendation),
+        ),
+      );
+    } else {
+      throw ServerException(
+        errorMessageModel: ErrorMessageModel.fromJson(result.data),
+      );
     }
   }
 }

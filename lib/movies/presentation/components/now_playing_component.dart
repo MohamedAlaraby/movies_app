@@ -5,9 +5,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movies_app/core/utils/enums.dart';
-import 'package:movies_app/movies/presentation/controller/movies_bloc.dart';
-import 'package:movies_app/movies/presentation/controller/movies_state.dart';
+import '../../../core/utils/enums.dart';
+import '../controller/movies_bloc.dart';
+import '../controller/movies_state.dart';
+import '../screens/movie_detail_screen.dart';
 
 import '../../../core/network/api_constants.dart';
 
@@ -31,22 +32,42 @@ class NowPlayingComponent extends StatelessWidget {
                 child: Center(child: CircularProgressIndicator()),
               );
             }
+          case RequestState.error:
+            {
+              return SizedBox(
+                height: 400,
+                child: Center(
+                  child: Text(state.nowPlayingStateMessage.toString()),
+                ),
+              );
+            }
+
           case RequestState.loaded:
             {
               return FadeIn(
-                duration: const Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 1000),
                 child: CarouselSlider(
                   options: CarouselOptions(
                     height: 400.0,
                     viewportFraction: 1.0,
                     onPageChanged: (index, reason) {},
+                    autoPlay: true,
                   ),
                   items: state.nowPlaingMovies.map(
-                    (item) {
+                    (movie) {
                       return GestureDetector(
                         key: const Key('openMovieMinimalDetail'),
                         onTap: () {
-                          ///  : NAVIGATE TO MOVIE DETAILS
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return MovieDetailScreen(
+                                  id: movie.id,
+                                );
+                              },
+                            ),
+                          );
                         },
                         child: Stack(
                           children: [
@@ -56,7 +77,7 @@ class NowPlayingComponent extends StatelessWidget {
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
-                                    // fromLTRB
+                                    // from LTRB
                                     Colors.transparent,
                                     Colors.black,
                                     Colors.black,
@@ -71,7 +92,7 @@ class NowPlayingComponent extends StatelessWidget {
                               child: CachedNetworkImage(
                                 height: 560.0,
                                 imageUrl:
-                                    ApiConstants.imageUrl(item.backdropPath),
+                                    ApiConstants.imageUrl(movie.backdropPath),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -106,7 +127,7 @@ class NowPlayingComponent extends StatelessWidget {
                                     padding:
                                         const EdgeInsets.only(bottom: 16.0),
                                     child: Text(
-                                      item.title,
+                                      movie.title,
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                           fontSize: 24, color: Colors.white),
@@ -120,15 +141,6 @@ class NowPlayingComponent extends StatelessWidget {
                       );
                     },
                   ).toList(),
-                ),
-              );
-            }
-          case RequestState.error:
-            {
-              return SizedBox(
-                height: 400,
-                child: Center(
-                  child: Text(state.nowPlayingStateMessage.toString()),
                 ),
               );
             }

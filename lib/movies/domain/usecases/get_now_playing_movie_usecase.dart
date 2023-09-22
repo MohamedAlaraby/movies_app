@@ -1,14 +1,15 @@
 import 'package:dartz/dartz.dart';
-import 'package:movies_app/movies/domain/entites/movie.dart';
+import '../../../core/usecases/base_usecases.dart';
+import '../entites/movie.dart';
 
 import '../../../core/error/failure.dart';
 import '../repository/base_movies_repository.dart';
 
-class GetNowPlayingMovieUseCase {
+class GetNowPlayingMovieUseCase extends BaseUseCase<List<Movie>,NoParameters> {
   final BaseMoviesRepository baseMoviesRepository;
   GetNowPlayingMovieUseCase(this.baseMoviesRepository);
-
-  Future<Either<Failure ,List<Movie>>> execute() async {
+  @override
+  Future<Either<Failure, List<Movie>>> call(NoParameters parameters) async {
     return await baseMoviesRepository.getNowPlayingMovie();
   }
 }
